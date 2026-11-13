@@ -35,7 +35,7 @@ const PROVIDERS = {
   anthropic: {
     label: "Anthropic",
     keyHint: "sk-ant-...",
-    models: ["claude-sonnet-4-6", "claude-haiku-4-5-20251001", "claude-opus-4-8"],
+    models: ["claude-sonnet-4-6", "claude-haiku-4-5", "claude-opus-4-8"],
   },
   google: {
     label: "Google Gemini",
@@ -206,11 +206,20 @@ ${c.red("  ▀█▄ ▄█▀")}   ${c.dim("Secure AI agent bootstrap · vault 
 
     // ── 3. Vault ───────────────────────────────────────────────────────────
     step(3, "Creating vault");
-    const vault = await api("POST", "/v1/vaults", {
-      token: jwt,
-      body: { name: `${slug(projectName)}-vault`, description: `Secrets for ${projectName} (1Claw Starter Kit)` },
-      where: "Create vault",
-    });
+    const createVault = (name) =>
+      api("POST", "/v1/vaults", {
+        token: jwt,
+        body: { name, description: `Secrets for ${projectName} (1Claw Starter Kit)` },
+        where: "Create vault",
+      });
+    let vault;
+    try {
+      vault = await createVault(`${slug(projectName)}-vault`);
+    } catch (e) {
+      if (e.status !== 409) throw e;
+      // Name taken (e.g. setup was re-run) — add a short random suffix.
+      vault = await createVault(`${slug(projectName)}-${Math.random().toString(36).slice(2, 6)}-vault`);
+    }
     created.vault = vault.id;
     ok(`Vault ${c.bold(vault.name)} ${c.dim(vault.id)}`);
 
@@ -303,7 +312,16 @@ ${c.red("  ▀█▄ ▄█▀")}   ${c.dim("Secure AI agent bootstrap · vault 
     // ── 8. Write encrypted .env + public config ────────────────────────────
     step(8, "Writing encrypted .env");
     writeFileSync(envPath, ""); // start fresh so no old values linger
-    await dotenvx.set("ONECLAW_AGENT_KEY", agentKey, { path: envPath, quiet: true });
+    // dotenvx 2.x asks where to keep the private key when run in a terminal.
+    // CI=1 makes it use the simple local .env.keys file without prompting.
+    const prevCI = process.env.CI;
+    process.env.CI = "1";
+    try {
+      await dotenvx.set("ONECLAW_AGENT_KEY", agentKey, { path: envPath, quiet: true });
+    } finally {
+      if (prevCI === undefined) delete process.env.CI;
+      else process.env.CI = prevCI;
+    }
     ok(`.env contains ONLY ${c.bold("ONECLAW_AGENT_KEY")} (encrypted with dotenvx)`);
     ok(`.env.keys holds the private decryption key — ${c.bold("never commit it")}`);
 
