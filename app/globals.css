@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
+/* Dark mode is class-based so the toggle can override the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 1Claw brand tokens — https://1claw.co/brand-kit */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --signature-red: #df171a;
+  --signature-gradient: linear-gradient(135deg, #df171a, #c4123a, #990029);
+
+  /* Light mode */
+  --primary: #990029;
+  --background: #fafafa;
+  --card: #ffffff;
+  --foreground: #0a0a0c;
+  --muted-foreground: #71717a;
+  --border: #e8d4d8;
+  --accent: #ffe8ec;
+  --destructive: #b71c1c;
+}
+
+.dark {
+  --primary: #b80030;
+  --background: #030304;
+  --card: #0a090b;
+  --foreground: #ffffff;
+  --muted-foreground: #6b6b73;
+  --border: #1e1c1d;
+  --accent: #1c1418;
+  --destructive: #c4123a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-destructive: var(--destructive);
+  --color-signature: var(--signature-red);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-wordmark: var(--font-bakbak);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.bg-signature {
+  background: var(--signature-gradient);
+}
+
+/* Subtle red glow behind the page, like 1claw.co */
+.glow {
+  background:
+    radial-gradient(600px circle at 50% -10%, color-mix(in srgb, var(--signature-red) 14%, transparent), transparent 70%),
+    var(--background);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--signature-red) 30%, transparent);
 }
