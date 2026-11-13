@@ -13,7 +13,7 @@ Build a secure AI chat agent in about 5 minutes. Powered by [1Claw](https://1cla
 ## Step 1 — Download and install
 
 ```bash
-git clone https://github.com/kmjones1979/1claw-starter-kit.git
+git clone https://github.com/1clawAI/1claw-starter-kit.git
 cd 1claw-starter-kit
 npm install
 ```
