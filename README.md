@@ -4,7 +4,7 @@ A minimal Next.js chat agent secured by [1Claw](https://1claw.co), built for hac
 One command creates your **vault**, **agent** and **policy** and wires them into the app.
 
 ```
-git clone <this repo> && cd 1claw-starter-kit
+git clone https://github.com/kmjones1979/1claw-starter-kit.git && cd 1claw-starter-kit
 npm install
 npm run setup     # interactive bootstrap
 npm run dev       # → http://localhost:3000
